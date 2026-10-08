@@ -1,0 +1,73 @@
+import random
+from flask import Flask, render_template_string, request
+
+app = Flask(__name__)
+
+# Giao diện HTML của trang web (Nút bấm và màu sắc)
+HTML_INTERFACE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Keo Bua Bao</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        button { font-size: 20px; padding: 10px 20px; margin: 10px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; }
+        button:hover { background-color: #ddd; }
+        .result { font-size: 24px; font-weight: bold; margin-top: 20px; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Trò chơi Kéo Búa Bao</h1>
+    <p>Hãy chọn một trong ba lựa chọn dưới đây:</p>
+    
+    <form action="/play" method="post">
+        <button type="submit" name="luachon" value="keo">✌️ Kéo</button>
+        <button type="submit" name="luachon" value="bua">✊ Búa</button>
+        <button type="submit" name="luachon" value="bao">✋ Bao</button>
+    </form>
+
+    {% if chon %}
+        <div class="result">
+            <p>Bạn chọn: <strong>{{ chon.upper() }}</strong></p>
+            <p>Máy chọn: <strong>{{ may.upper() }}</strong></p>
+            <hr>
+            <p style="color: blue; font-size: 30px;">KẾT QUẢ: {{ ketqua }}</p>
+        </div>
+    {% endif %}
+</body>
+</html>
+"""
+
+
+@app.route("/")
+def home():
+    return render_template_string(HTML_INTERFACE)
+
+
+@app.route("/play", method=["POST"])
+def play():
+    # Lấy lựa chọn khi người dùng click vào nút trên web
+    chon = request.form.get("luachon")
+
+    # Giữ nguyên logic xử lý ngẫu nhiên từ code cũ của bạn
+    may = random.choice(["keo", "bua", "bao"])
+
+    # Giữ nguyên logic so sánh cũ của bạn
+    if chon == may:
+        ketqua = "HÒA TRẬN! 🤝"
+    elif (
+        (chon == "keo" and may == "bao")
+        or (chon == "bao" and may == "bua")
+        or (chon == "bua" and may == "keo")
+    ):
+        ketqua = "BẠN THẮNG RỒI! 🎉"
+    else:
+        ketqua = "BẠN THUA MẤT RỒI! 😢"
+
+    return render_template_string(
+        HTML_INTERFACE, chon=chon, may=may, ketqua=ketqua
+    )
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
